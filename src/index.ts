@@ -1,12 +1,23 @@
-const fib = (n: number): number =>
-  n < 1 ? 0 : n <= 2 ? 1 : fib(n - 1) + fib(n - 2);
+import { Worker } from 'worker_threads';
 
-const doFib = (iter: number): Promise<number> =>
-  new Promise((resolve) => {
+const doFib = async (iter: number) =>
+  new Promise((resolve, reject) => {
     const start = Date.now();
-    const result = fib(iter);
-    console.log(`doFib done in: ${Date.now() - start}ms`);
-    resolve(result);
+
+    const worker = new Worker('./fib.ts', {
+      workerData: {
+        iter,
+      },
+    });
+
+    worker.once('message', (data) => {
+      console.log(
+        `worker [${worker.threadId}]: done in ${Date.now() - start}ms`,
+      );
+      resolve(data);
+    });
+
+    worker.once('error', reject);
   });
 
 const main = async () => {
@@ -26,17 +37,3 @@ const main = async () => {
 };
 
 main().catch(console.error);
-
-// const { PerformanceObserver, performance } = require('node:perf_hooks');
-
-// const obs = new PerformanceObserver((items) => {
-//   console.log(items.getEntries()[0].duration);
-//   performance.clearMarks();
-// });
-// obs.observe({ type: 'measure' });
-
-// performance.mark("example-start")
-// await someAction()
-// performance.mark("example-end")
-
-// performance.measure("example", "example-start", "example-end")
