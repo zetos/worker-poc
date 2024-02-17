@@ -4,7 +4,10 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "ts-node-dev --respawn src/index.ts"
+    "start": "ts-node-dev src/index.ts",
+    "sync": "ts-node-dev src/example/sync.ts",
+    "build": "tsc",
+    "build:run": "tsc && node ./build/index.js"
   },
   "keywords": [],
   "author": "",
